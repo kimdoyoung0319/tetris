@@ -1,3 +1,3 @@
 Tetris
 ---
-A simple Tetris game for learning concepts of object-oriented programming made with C++.
+A simple command-line Tetris game for learning concepts of object-oriented programming made with C++.
