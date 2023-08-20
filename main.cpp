@@ -3,24 +3,20 @@
 #include "board.h"
 
 int main(void){
-    vector<vector<bool>> shape = {
-        {0, 1, 1, 0},
-        {0, 1, 1, 0},
-        {0, 1, 1, 0},
-        {0, 1, 1, 0},
-    };
-    
-    Block block(shape);
+    Block block(SHAPE_O);
     Board board;
+    board.update_board(block);
+    board.print_board();
     
-    board.print_board();
-    board.update_board(block);
-    std::cout << "-----------------------------" << std::endl;
-    board.print_board();
-    block.move_right();
-    board.update_board(block);
-    std::cout << "-----------------------------" << std::endl;
-    board.print_board();
+    while(true){
+        block.move_right();
+        if(board.check_block(block)){
+            board.update_board(block);
+            board.print_board();
+        } else{
+            break;
+        }
+    }
     
     return 0;
 }

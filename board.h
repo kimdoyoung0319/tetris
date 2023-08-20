@@ -1,25 +1,28 @@
-#ifndef _BOARD_H
-#define _BOARD_H
+#ifndef BOARD_H
+#define BOARD_H
 
+#include <iostream>
 #include <vector>
+#include <algorithm>
 #include "block.h"
 
 using std::vector;
+using std::cout;
+using std::endl;
 
-const int LENGTH_ROW= 10;
-const int LENGTH_COL= 21;
+constexpr int LENGTH_ROW = 10;
+constexpr int LENGTH_COL = 21;
 
-class Board{
+class Board {
     private:
-        vector<vector<bool>> board;
+        vector<vector<bool>> board_static, board_dynamic;
     public:
         Board();
         void print_board() const;
         void update_board(const Block &);
-        void delete_line();
-        bool check_position(const Block &) const; 
-        bool check_end(const Block &) const;
-        bool check_line() const;
+        void delete_last_line();
+        bool check_block(const Block &) const;
+        bool check_last_line() const;
 };
 
 #endif
