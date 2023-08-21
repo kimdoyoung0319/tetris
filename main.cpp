@@ -9,7 +9,7 @@ int main(void){
     board.print_board();
     
     while(true){
-        block.move_right();
+        block.move_down();
         if(board.check_block(block)){
             board.update_board(block);
             board.print_board();
@@ -17,6 +17,11 @@ int main(void){
             break;
         }
     }
+    
+    board.fix_block();
+    if(board.check_last_line())
+        board.delete_last_line();
+    board.print_board();
     
     return 0;
 }

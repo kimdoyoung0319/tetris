@@ -1,0 +1,5 @@
+1. implement rotate_cw and rotate_ccw function
+2. hard-code shapes of blocks (ex. L block, Z block.. etc)
+3. fix algorithm for oob-detection(check_position), or update_board?
+    problem: making segfault because if the square is not filled and oob, the check_position returns true
+    problem: for some reason, it makes segfault in current main function.

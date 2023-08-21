@@ -21,6 +21,7 @@ class Board {
         void print_board() const;
         void update_board(const Block &);
         void delete_last_line();
+        void fix_block();
         bool check_block(const Block &) const;
         bool check_last_line() const;
 };

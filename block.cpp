@@ -27,6 +27,9 @@ void Block::move_down() {
     position.y++;
 }
 
+void Block::rotate_cw() {
+}
+
 void Block::undo() {
     Coordinate temp_position = position;
     position = prev_position;
