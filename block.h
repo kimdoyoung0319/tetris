@@ -7,26 +7,31 @@ using std::vector;
 
 struct Coordinate {
     int x, y;
+    const Coordinate operator+(const Coordinate &);
+    const Coordinate operator-(const Coordinate &);
 };
 
 constexpr int BLOCK_SIDE = 4;
 constexpr int INITIAL_POS_X = 3;
 constexpr int INITIAL_POS_Y = 0;
+constexpr int ORIGIN_X = 2;
+constexpr int ORIGIN_Y = 1;
 constexpr Coordinate INITIAL_POS{INITIAL_POS_X, INITIAL_POS_Y};
+constexpr Coordinate ORIGIN{ORIGIN_X, ORIGIN_Y};
 
-const vector<vector<bool>> SHAPE_I = {{0, 1, 0, 0}, 
-                                      {0, 1, 0, 0}, 
-                                      {0, 1, 0, 0}, 
-                                      {0, 1, 0, 0}};
-
-const vector<vector<bool>> SHAPE_J = {{0, 0, 1, 0}, 
-                                      {0, 0, 1, 0}, 
-                                      {0, 1, 1, 0}, 
+const vector<vector<bool>> SHAPE_I = {{0, 0, 0, 0}, 
+                                      {1, 1, 1, 1}, 
+                                      {0, 0, 0, 0}, 
                                       {0, 0, 0, 0}};
 
-const vector<vector<bool>> SHAPE_L = {{0, 1, 0, 0}, 
-                                      {0, 1, 0, 0}, 
-                                      {0, 1, 1, 0}, 
+const vector<vector<bool>> SHAPE_J = {{0, 1, 0, 0}, 
+                                      {0, 1, 1, 1}, 
+                                      {0, 0, 0, 0}, 
+                                      {0, 0, 0, 0}};
+
+const vector<vector<bool>> SHAPE_L = {{0, 0, 0, 1}, 
+                                      {0, 1, 1, 1}, 
+                                      {0, 0, 0, 0}, 
                                       {0, 0, 0, 0}};
 
 const vector<vector<bool>> SHAPE_O = {{0, 1, 1, 0}, 
@@ -34,19 +39,19 @@ const vector<vector<bool>> SHAPE_O = {{0, 1, 1, 0},
                                       {0, 0, 0, 0}, 
                                       {0, 0, 0, 0}};
 
-const vector<vector<bool>> SHAPE_S = {{0, 1, 1, 0}, 
-                                      {1, 1, 0, 0}, 
-                                      {0, 0, 0, 0}, 
-                                      {0, 0, 0, 0}};
-
-const vector<vector<bool>> SHAPE_T = {{0, 1, 1, 1}, 
+const vector<vector<bool>> SHAPE_S = {{0, 1, 0, 0}, 
+                                      {0, 1, 1, 0}, 
                                       {0, 0, 1, 0}, 
+                                      {0, 0, 0, 0}};
+
+const vector<vector<bool>> SHAPE_T = {{0, 0, 1, 0}, 
+                                      {0, 1, 1, 1}, 
                                       {0, 0, 0, 0}, 
                                       {0, 0, 0, 0}};
 
-const vector<vector<bool>> SHAPE_Z = {{0, 1, 1, 0}, 
-                                      {0, 0, 1, 1}, 
-                                      {0, 0, 0, 0}, 
+const vector<vector<bool>> SHAPE_Z = {{0, 0, 1, 0}, 
+                                      {0, 1, 1, 0}, 
+                                      {0, 1, 0, 0}, 
                                       {0, 0, 0, 0}};
 
 class Block {

@@ -1,4 +1,13 @@
 #include "block.h"
+#include <iostream>
+
+const Coordinate Coordinate::operator+(const Coordinate & other) {
+    return Coordinate{x + other.x, y + other.y};
+}
+
+const Coordinate Coordinate::operator-(const Coordinate & other) {
+    return Coordinate{x - other.x, y - other.y};
+}
 
 Block::Block() : position(INITIAL_POS), 
                  shape(BLOCK_SIDE, vector<bool>(BLOCK_SIDE, false)),
@@ -28,16 +37,44 @@ void Block::move_down() {
 }
 
 void Block::rotate_cw() {
+    prev_shape = shape;
+    vector<vector<bool>> new_shape(BLOCK_SIDE, vector<bool>(BLOCK_SIDE, false));
+    Coordinate new_position, relative_position;
+    for(int i = 0; i < BLOCK_SIDE; i++) {
+        for(int j = 0; j < BLOCK_SIDE; j++) {
+            if(shape[i][j]){
+                relative_position = Coordinate{j, i} - ORIGIN;
+                new_position = Coordinate{-relative_position.y, relative_position.x} + ORIGIN;
+                new_shape[new_position.y][new_position.x] = shape[i][j];
+            }
+        }
+    }
+    shape = new_shape;
+    
+    return;
+}
+
+void Block::rotate_ccw() {
+    prev_shape = shape;
+    vector<vector<bool>> new_shape(BLOCK_SIDE, vector<bool>(BLOCK_SIDE, false));
+    Coordinate new_position, relative_position;
+    for(int i = 0; i < BLOCK_SIDE; i++) {
+        for(int j = 0; j < BLOCK_SIDE; j++) {
+            if(shape[i][j]){
+                relative_position = Coordinate{j, i} - ORIGIN;
+                new_position = Coordinate{relative_position.y, -relative_position.x} + ORIGIN;
+                new_shape[new_position.y][new_position.x] = shape[i][j];
+            }
+        }
+    }
+    shape = new_shape;
+    
+    return;
 }
 
 void Block::undo() {
-    Coordinate temp_position = position;
-    position = prev_position;
-    prev_position = temp_position;
-    
-    vector<vector<bool>> temp_shape = shape;
-    shape = prev_shape;
-    prev_shape = temp_shape;
+    std::swap<Coordinate>(position, prev_position);
+    std::swap<vector<vector<bool>>>(shape, prev_shape);
 }
 
 const Coordinate & Block::get_position() const {

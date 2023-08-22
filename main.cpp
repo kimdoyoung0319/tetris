@@ -3,24 +3,16 @@
 #include "board.h"
 
 int main(void){
-    Block block(SHAPE_O);
+    Block block(SHAPE_Z);
     Board board;
     board.update_board(block);
     board.print_board();
     
-    while(true){
-        block.move_down();
-        if(board.check_block(block)){
-            board.update_board(block);
-            board.print_board();
-        } else{
-            break;
-        }
-    }
-    
-    board.fix_block();
-    if(board.check_last_line())
-        board.delete_last_line();
+    block.rotate_cw();
+    board.update_board(block);
+    board.print_board();
+    block.rotate_ccw();
+    board.update_board(block);
     board.print_board();
     
     return 0;
