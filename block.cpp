@@ -9,16 +9,23 @@ const Coordinate Coordinate::operator-(const Coordinate & other) {
     return Coordinate{x - other.x, y - other.y};
 }
 
-Block::Block() : position(INITIAL_POS), 
-                 shape(BLOCK_SIDE, vector<bool>(BLOCK_SIDE, false)),
-                 prev_position(INITIAL_POS),
-                 prev_shape(BLOCK_SIDE, vector<bool>(BLOCK_SIDE, false)) {
+Block::Block(BlockType block_type) : position(INITIAL_POS), 
+                                    shape(blocktype_to_shape(block_type)),
+                                    prev_position(INITIAL_POS),
+                                    prev_shape(shape) {
 }
 
-Block::Block(const vector<vector<bool>> & shape) : position(INITIAL_POS), 
-                                                   shape(shape),
-                                                   prev_position(INITIAL_POS),
-                                                   prev_shape(shape) {
+const vector<vector<bool>> Block::blocktype_to_shape(BlockType block_type) {
+    switch(block_type) {
+        case BLOCK_I: return SHAPE_I;
+        case BLOCK_J: return SHAPE_J;
+        case BLOCK_L: return SHAPE_L;
+        case BLOCK_O: return SHAPE_O;
+        case BLOCK_S: return SHAPE_S;
+        case BLOCK_T: return SHAPE_T;
+        case BLOCK_Z: return SHAPE_Z;
+        default: throw std::invalid_argument("Wrong block type to blocktype_to_shape");
+    }
 }
 
 void Block::move_right() {

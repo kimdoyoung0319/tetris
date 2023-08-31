@@ -2,6 +2,7 @@
 #define BLOCK_H
 
 #include <vector>
+#include <stdexcept>
 
 using std::vector;
 
@@ -10,6 +11,17 @@ struct Coordinate {
     const Coordinate operator+(const Coordinate &);
     const Coordinate operator-(const Coordinate &);
 };
+
+enum BlockType {
+    BLOCK_I,
+    BLOCK_J,
+    BLOCK_L,
+    BLOCK_O,
+    BLOCK_S,
+    BLOCK_T,
+    BLOCK_Z,
+};
+
 
 constexpr int BLOCK_SIDE = 4;
 constexpr int INITIAL_POS_X = 3;
@@ -54,13 +66,14 @@ const vector<vector<bool>> SHAPE_Z = {{0, 0, 1, 0},
                                       {0, 1, 0, 0}, 
                                       {0, 0, 0, 0}};
 
+//better re-implement get_shape into is_filled
 class Block {
     private:
         Coordinate position, prev_position;
         vector<vector<bool>> shape, prev_shape;
+        const vector<vector<bool>> blocktype_to_shape(BlockType);
     public:
-        Block();
-        Block(const vector<vector<bool>> &);
+        Block(BlockType);
         void move_right();
         void move_left();
         void move_down();

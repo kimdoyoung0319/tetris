@@ -1,5 +1,6 @@
-1. implement rotate_cw and rotate_ccw function
-2. hard-code shapes of blocks (ex. L block, Z block.. etc)
-3. fix algorithm for oob-detection(check_position), or update_board?
-    problem: making segfault because if the square is not filled and oob, the check_position returns true
-    problem: for some reason, it makes segfault in current main function.
+1. making current block more highlighted w/ different colors
+2. refactor code
+    wrapping some game.run() codes so making it more readable
+3. make routine in game.run() that checks if the last line is full
+4. implement is_game_end() function
+5. re-write blocks by inheritance and making rotation more accurate

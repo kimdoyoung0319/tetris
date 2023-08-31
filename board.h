@@ -18,12 +18,12 @@ class Board {
         vector<vector<bool>> board_static, board_dynamic;
     public:
         Board();
-        void print_board() const;
         void update_board(const Block &);
         void delete_last_line();
         void fix_block();
-        bool check_block(const Block &) const;
-        bool check_last_line() const;
+        bool is_block_valid(const Block &) const;
+        bool is_last_line_full() const;
+        bool is_filled(const Coordinate &) const;
 };
 
 #endif

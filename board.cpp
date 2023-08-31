@@ -4,25 +4,6 @@ Board::Board() : board_static(LENGTH_COL, vector<bool>(LENGTH_ROW, false)),
                  board_dynamic(LENGTH_COL, vector<bool>(LENGTH_ROW, false)) {
 }
 
-void Board::print_board() const {
-    for(int i = 0; i < LENGTH_ROW + 2; i++)
-        cout << "■";
-    cout << '\n';
-    
-    for(int i = 0; i < LENGTH_COL; i++) {
-        cout << "■";
-        for(int j = 0; j < LENGTH_ROW; j++)
-            cout << ((board_static[i][j] || board_dynamic[i][j]) ? "■" : "□");
-        cout << "■\n";
-    }
-    
-    for(int i = 0; i < LENGTH_ROW + 2; i++)
-        cout << "■";
-    cout << '\n';
-    
-    return;
-}
-
 void Board::update_board(const Block & block) {
     const Coordinate & position = block.get_position();
     const vector<vector<bool>> & shape = block.get_shape();
@@ -60,7 +41,7 @@ void Board::fix_block() {
     return;
 }
 
-bool Board::check_block(const Block & block) const {
+bool Board::is_block_valid(const Block & block) const {
     const Coordinate & position = block.get_position();
     const vector<vector<bool>> & shape = block.get_shape();
     bool x_out_of_bound, y_out_of_bound, overlap;
@@ -81,11 +62,15 @@ bool Board::check_block(const Block & block) const {
     return true;
 }
 
-bool Board::check_last_line() const {
+bool Board::is_last_line_full() const {
     vector<bool> last_line = *board_static.rbegin();
     for(auto square : last_line){
         if(!square) return false;
     }
     
     return true;
+}
+
+bool Board::is_filled(const Coordinate & position) const {
+    return board_static[position.y][position.x] || board_dynamic[position.y][position.x];
 }

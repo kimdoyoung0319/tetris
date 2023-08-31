@@ -3,11 +3,19 @@
 
 int main(void) {
     initscr();
-    //must be used after initscr
-    WINDOW * window = newwin(5, 15, 2, 2);
-    box(window, 0, 0);
-    wrefresh(window);
-    wgetch();
+    cbreak();
+    noecho();
+    timeout(0);
+    while(true) {
+        char user_input = getch();
+        if(user_input == ERR)
+            printw("ERR\n");
+        else
+            printw("%c\n", user_input);
+        flushinp();
+        sleep(1);
+    }
+    wrefresh(stdscr);
     endwin();
     
     return 0;
