@@ -12,11 +12,13 @@ constexpr int MAIN_WINDOW_HEIGHT = 23;
 constexpr int MAIN_WINDOW_POS_X = 1;
 constexpr int MAIN_WINDOW_POS_Y = 1;
 constexpr int BLACK_AND_WHITE = 1;
+constexpr int BLACK_AND_YELLOW = 2;
 
 class Screen {
     private:
         WINDOW * main_window;
         void draw_square(const Coordinate &) const;
+        void draw_square_highlighted(const Coordinate &) const;
         void erase_square(const Coordinate &) const;
         inline void refresh_main_window() const;
         friend class Game;

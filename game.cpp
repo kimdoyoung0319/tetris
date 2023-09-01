@@ -2,6 +2,7 @@
 
 Game::Game() : block_down_counter(INITIAL_COUNTER), game_screen(), game_board() {
     srand(time(NULL));
+    current_block = unique_ptr<Block>(new Block(get_next_block()));
 }
 
 void Game::run() {
@@ -14,9 +15,6 @@ void Game::run() {
 
 void Game::run_single_frame() {
     usleep(FRAME_DURATION_IN_MILLISECONDS * MICROSECONDS_PER_MILLISECONDS);
-
-    if(!current_block)
-        current_block = unique_ptr<Block>(new Block(get_next_block()));
 
     if(!block_down_counter) {
         current_block->move_down();
@@ -107,7 +105,13 @@ const char Game::get_user_input() const {
 }
 
 //need to be modified
-bool Game::is_game_end() const {
-    return false;
+bool Game::is_game_end() {
+    if(!current_block)
+        current_block = unique_ptr<Block>(new Block(get_next_block()));
+
+    if(game_board.is_block_valid(*current_block))
+        return false;
+    else
+        return true;
 }
 

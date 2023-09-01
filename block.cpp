@@ -24,7 +24,7 @@ const vector<vector<bool>> Block::blocktype_to_shape(BlockType block_type) {
         case BLOCK_S: return SHAPE_S;
         case BLOCK_T: return SHAPE_T;
         case BLOCK_Z: return SHAPE_Z;
-        default: throw std::invalid_argument("Wrong block type to blocktype_to_shape");
+        default: throw std::invalid_argument("Wrong block type to blocktype_to_shape()");
     }
 }
 
@@ -88,6 +88,6 @@ const Coordinate & Block::get_position() const {
     return position;
 }
 
-const vector<vector<bool>> & Block::get_shape() const {
-    return shape;
+const bool Block::is_filled(const Coordinate & position) const {
+    return shape[position.y][position.x];
 }

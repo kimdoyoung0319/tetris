@@ -66,7 +66,6 @@ const vector<vector<bool>> SHAPE_Z = {{0, 0, 1, 0},
                                       {0, 1, 0, 0}, 
                                       {0, 0, 0, 0}};
 
-//better re-implement get_shape into is_filled
 class Block {
     private:
         Coordinate position, prev_position;
@@ -81,7 +80,7 @@ class Block {
         void rotate_ccw();
         void undo();
         const Coordinate & get_position() const;
-        const vector<vector<bool>> & get_shape() const;
+        const bool is_filled(const Coordinate &) const;
 };
 
 #endif

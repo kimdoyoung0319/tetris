@@ -24,6 +24,8 @@ class Board {
         bool is_block_valid(const Block &) const;
         bool is_last_line_full() const;
         bool is_filled(const Coordinate &) const;
+        bool is_filled_dynamic(const Coordinate &) const;
+        bool is_filled_static(const Coordinate &) const;
 };
 
 #endif

@@ -24,7 +24,7 @@ class Game {
         Board game_board;
         unique_ptr<Block> current_block;
         BlockType get_next_block() const;
-        bool is_game_end() const;
+        bool is_game_end();
         bool is_current_block_null() const;
         void run_single_frame();
         const char get_user_input() const;
