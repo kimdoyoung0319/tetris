@@ -1,35 +1,63 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <memory>
 #include <map>
+#include <memory>
+#include <algorithm>
+#include <chrono>
+#include <thread>
+#include <random>
 #include <cstdlib>
 #include <ctime>
-#include <unistd.h>
+
 #include "block.h"
 #include "board.h"
 #include "screen.h"
 
-using std::unique_ptr;
-using std::map;
+typedef std::unique_ptr<Block> block_ptr_t;
 
-constexpr int FRAME_DURATION_IN_MILLISECONDS = 100;
-constexpr int MICROSECONDS_PER_MILLISECONDS = 1000;
-constexpr int INITIAL_COUNTER = 5;
+class CyclicCounter {
+    private:
+        const int initial_value;
+        int value;
+
+    public:
+        CyclicCounter(int);
+
+        bool is_zero() const;
+        CyclicCounter operator--(int);
+};
+
+class RandomGenerator {
+    private:
+        std::random_device device;
+        std::minstd_rand generator;
+        std::uniform_int_distribution<int> distribution;
+
+    public:
+        RandomGenerator(int, int);
+
+        int operator()();
+};
 
 class Game {
     private:
-        int block_down_counter;
+        bool is_game_end;
+        CyclicCounter force_down_counter;
+        RandomGenerator random_generator;
+
         Screen game_screen;
         Board game_board;
-        unique_ptr<Block> current_block;
-        BlockType get_next_block() const;
-        bool is_game_end();
-        bool is_current_block_null() const;
+        block_ptr_t current_block;
+
         void run_single_frame();
+        block_ptr_t generate_block();
+        void sleep_for_frame_duration() const;
         const char get_user_input() const;
+
     public:
         Game();
+
         void run();
 };
 

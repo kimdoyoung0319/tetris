@@ -1,9 +1,9 @@
 tetris: main.o board.o block.o screen.o game.o
 	g++ -o tetris main.o board.o block.o screen.o game.o -lncursesw
 
-test: test.cpp
-	g++ test.cpp -o test -lncursesw
-    
+test: test.o
+	g++ -o test test.o -lncursesw  
+	
 main.o: main.cpp board.h block.h
 	g++ -c -g main.cpp
     

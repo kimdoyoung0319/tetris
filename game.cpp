@@ -1,36 +1,75 @@
 #include "game.h"
 
-Game::Game() : block_down_counter(INITIAL_COUNTER), game_screen(), game_board() {
-    srand(time(NULL));
-    current_block = unique_ptr<Block>(new Block(get_next_block()));
+CyclicCounter::CyclicCounter(int initial_value = 5) : initial_value(initial_value), 
+                                                      value(initial_value) {
+}
+
+bool CyclicCounter::is_zero() const {
+    return value == 0;
+}
+
+CyclicCounter CyclicCounter::operator--(int) {
+    CyclicCounter original = *this;
+
+    if(is_zero())
+        value = initial_value;
+    else
+        value--;
+
+    return original;
+}
+
+//Constructs random number generator that produces random number in range of [first, last].
+RandomGenerator::RandomGenerator(int first, int last) : device(),
+                                                        generator(device()),
+                                                        distribution(first, last) {
+}
+
+int RandomGenerator::operator()() {
+    return distribution(generator);
+}
+
+Game::Game() : force_down_counter(), 
+               game_screen(),
+               game_board(), 
+               current_block(generate_block()),
+               random_generator(BLOCK_I, BLOCK_Z) {
 }
 
 void Game::run() {
     do {
         run_single_frame();
-    } while(!is_game_end());
+    } while(!is_game_end);
 
     return;
 }
 
 void Game::run_single_frame() {
-    usleep(FRAME_DURATION_IN_MILLISECONDS * MICROSECONDS_PER_MILLISECONDS);
+    sleep_for_frame_duration();
 
-    if(!block_down_counter) {
+    if(!current_block) {
+        current_block = generate_block();
+
+        if(!game_board.is_valid(*current_block)) {
+            is_game_end = true;
+            return;
+        }
+    }
+
+    bool is_block_bottom_touched = false;
+
+    if(force_down_counter.is_zero()) {
         current_block->move_down();
-        block_down_counter = INITIAL_COUNTER;
-    }
-    block_down_counter--;
 
-    if(game_board.is_block_valid(*current_block)) {
-        game_board.update_board(*current_block);
-    } else {
-        current_block->undo();
-        game_board.fix_block();
-        current_block.reset(nullptr);
-        game_screen.update_main_window(game_board);
-        return;
+        if(game_board.is_valid(*current_block)) {
+            game_screen.update_main_window(game_board, *current_block);
+        } else {
+            current_block->undo();
+            is_block_bottom_touched = true;
+        }
     }
+
+    force_down_counter--;
 
     char user_input = get_user_input();
     switch(user_input) {
@@ -39,63 +78,83 @@ void Game::run_single_frame() {
             break;
         case 'j':
             current_block->move_down();
-            if(!game_board.is_block_valid(*current_block)) {
+
+            if(!game_board.is_valid(*current_block)) {
                 current_block->undo();
-                game_board.fix_block();
-                current_block.reset(nullptr);
-                game_screen.update_main_window(game_board);
-                return;
+                is_block_bottom_touched = true;
             }
+
             break;
         case 'k':
-            current_block->rotate_ccw();
+            current_block->rotate();
             break;
         case 'l':
             current_block->move_right();
             break;
     }
 
-    if(game_board.is_block_valid(*current_block))
-        game_board.update_board(*current_block);
+    if(game_board.is_valid(*current_block))
+        game_screen.update_main_window(game_board, *current_block);
     else
         current_block->undo();
 
-    if(game_board.is_last_line_full())
-        game_board.delete_last_line();
+    if(is_block_bottom_touched) {
+        game_board.fix(*current_block);
+        current_block.reset();
+        game_board.erase_full_rows();
+        game_screen.update_main_window(game_board);
 
-    game_screen.update_main_window(game_board);
+        return;
+    }
 
     return;
 }
 
-BlockType Game::get_next_block() const {
-    BlockType random_block_type;
-    static map<BlockType, bool> block_appeared;
-    bool is_all_value_true = true;
+void Game::sleep_for_frame_duration() const {
+    static const std::chrono::milliseconds frame_duration_in_ms(100);
+    std::this_thread::sleep_for(frame_duration_in_ms);
 
-    for(auto it = block_appeared.begin(); it != block_appeared.end(); it++) {
-        if(!it->second) 
-            is_all_value_true = false;
+    return;
+}
+
+block_ptr_t Game::generate_block() {
+    using std::map;
+    using std::pair;
+    using std::all_of;
+
+    static map<BlockType, bool> is_generated;
+
+    bool is_every_type_generated 
+        = all_of(is_generated.begin(),
+                 is_generated.end(),
+                 [](pair<BlockType, bool> e) {return e.second;});
+
+    if(is_every_type_generated) {
+        is_generated.clear();
+
+        for(int i = BLOCK_I; i != BLOCK_Z; i++)
+            is_generated[static_cast<BlockType>(i)] = false;
     }
 
-    if(is_all_value_true)
-        block_appeared = map<BlockType, bool> {
-            {BLOCK_I, false},
-            {BLOCK_J, false},
-            {BLOCK_L, false},
-            {BLOCK_O, false},
-            {BLOCK_S, false},
-            {BLOCK_T, false},
-            {BLOCK_Z, false},
-        };
+    BlockType random_block_type;
 
     do {
-        random_block_type = static_cast<BlockType>(rand() % 7);
-    } while(block_appeared[random_block_type]); 
+        random_block_type
+            = static_cast<BlockType>(random_generator());
+    } while(is_generated[random_block_type]);
 
-    block_appeared[random_block_type] = true;
+    is_generated[random_block_type] = true;
 
-    return random_block_type;
+    switch(random_block_type) {
+        case BLOCK_I: return block_ptr_t(new IBlock()); 
+        case BLOCK_J: return block_ptr_t(new JBlock()); 
+        case BLOCK_L: return block_ptr_t(new LBlock()); 
+        case BLOCK_O: return block_ptr_t(new OBlock()); 
+        case BLOCK_S: return block_ptr_t(new SBlock()); 
+        case BLOCK_T: return block_ptr_t(new TBlock()); 
+        case BLOCK_Z: return block_ptr_t(new ZBlock()); 
+        default: return nullptr;
+    }
 }
 
 const char Game::get_user_input() const {
@@ -103,15 +162,3 @@ const char Game::get_user_input() const {
     flushinp();
     return user_input;
 }
-
-//need to be modified
-bool Game::is_game_end() {
-    if(!current_block)
-        current_block = unique_ptr<Block>(new Block(get_next_block()));
-
-    if(game_board.is_block_valid(*current_block))
-        return false;
-    else
-        return true;
-}
-
