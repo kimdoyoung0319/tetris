@@ -3,16 +3,8 @@
 Board::Board() : shape(col_size, row_t(row_size, false)) {
 }
 
-/*
-void Board::erase_last_row() {
-    shape.pop_back();
-    shape.emplace(shape.begin(), row_t(row_size, false));
-    
-    return;
-}
-*/
-
-void Board::erase_full_rows() {
+//Erases full rows in the board, and returns the number of erased rows.
+int Board::erase_full_rows() {
     using std::all_of;
     using std::remove_if;
     using std::function;
@@ -21,16 +13,15 @@ void Board::erase_full_rows() {
         return all_of(row.begin(), row.end(), [](bool e) {return e;});
     };
 
-    //check out erase-remove idiom
-    //need to be explained by a comment.
+    //Used erase-remove idiom to 'erase' all the full rows.
     shape.erase(remove_if(shape.begin(), shape.end(), is_row_full), shape.end());
 
-    int rows_to_insert = col_size - shape.size();
+    int erased_rows = col_size - shape.size();
 
-    for(int i = 0; i < rows_to_insert; i++)
+    for(int i = 0; i < erased_rows; i++)
         shape.emplace(shape.begin(), row_t(row_size, false));
 
-    return;
+    return erased_rows;
 }
 
 void Board::fix(const Block & block) {
@@ -45,19 +36,6 @@ void Board::fix(const Block & block) {
     
     return;
 }
-
-/*
-bool Board::is_last_row_full() const {
-    row_t last_row = *shape.rbegin(); 
-
-    for(bool square : last_row) {
-        if(!square)
-            return false;
-    }
-    
-    return true;
-}
-*/
 
 bool Board::is_valid(const Block & block) const {
     const Coordinate & position = block.get_position();

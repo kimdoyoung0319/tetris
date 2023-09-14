@@ -17,8 +17,25 @@ Screen::Screen() {
                          main_window_position.y,
                          main_window_position.x);
 
+    score_window = newwin(score_window_height,
+                          score_window_width,
+                          score_window_position.y,
+                          score_window_position.x);
+    
+    message_window = newwin(message_window_height,
+                            message_window_width,
+                            message_window_position.y,
+                            message_window_position.x);
+
     wtimeout(main_window, 0);
+
     box(main_window, 0, 0);
+    box(score_window, 0, 0);
+    box(message_window, 0, 0);
+
+    mvwprintw(main_window, 0, 1, "Game");
+    mvwprintw(score_window, 0, 1, "Score");
+    mvwprintw(message_window, 0, 1, "Message");
 }
 
 Screen::~Screen() {
@@ -47,7 +64,7 @@ void Screen::update_main_window(const Board & board, const Block & block) const 
         }
     }
 
-    refresh_main_window();
+    refresh_window(main_window);
 
     return;
 }
@@ -62,7 +79,7 @@ void Screen::update_main_window(const Board & board) const {
         }
     }
 
-    refresh_main_window();
+    refresh_window(main_window);
 }
 
 void Screen::draw_square_normal(const Coordinate & coordinate) const {
@@ -100,8 +117,55 @@ void Screen::erase_square(const Coordinate & coordinate) const {
     return;
 }
 
-void Screen::refresh_main_window() const {
-    wrefresh(main_window);
+void Screen::update_score_window(int score) const {
+    Coordinate cursor_coordinate{1, 1};
+
+    mvwprintw(score_window, cursor_coordinate.y, cursor_coordinate.x, "%d", score);
+    refresh_window(score_window);
+
+    return;
+}
+
+void Screen::update_message_window(MessageType message) const {
+    using std::string;
+
+    Coordinate cursor_coordinate{1, 1};
+    string message_str;
+
+    switch(message) {
+        case MESSAGE_EMPTY:
+            message_str = "";
+            break;
+        case MESSAGE_SINGLE:
+            message_str = "Single!";
+            break;
+        case MESSAGE_DOUBLE:
+            message_str = "Double!";
+            break;
+        case MESSAGE_TRIPLE:
+            message_str = "Triple!";
+            break;
+        case MESSAGE_TETRIS:
+            message_str = "Tetris!";
+            break;
+        case MESSAGE_GAME_OVER:
+            message_str = "Game Over!";
+            break;
+    }
+
+    mvwprintw(message_window,
+              cursor_coordinate.y,
+              cursor_coordinate.x,
+              "%s",
+              message_str.c_str());
+
+    refresh_window(message_window);
+
+    return;
+}
+
+void Screen::refresh_window(WINDOW * window) const {
+    wrefresh(window);
     
     return;
 }

@@ -1,45 +1,21 @@
 #include "game.h"
 
-CyclicCounter::CyclicCounter(int initial_value = 5) : initial_value(initial_value), 
-                                                      value(initial_value) {
-}
-
-bool CyclicCounter::is_zero() const {
-    return value == 0;
-}
-
-CyclicCounter CyclicCounter::operator--(int) {
-    CyclicCounter original = *this;
-
-    if(is_zero())
-        value = initial_value;
-    else
-        value--;
-
-    return original;
-}
-
-//Constructs random number generator that produces random number in range of [first, last].
-RandomGenerator::RandomGenerator(int first, int last) : device(),
-                                                        generator(device()),
-                                                        distribution(first, last) {
-}
-
-int RandomGenerator::operator()() {
-    return distribution(generator);
-}
-
 Game::Game() : force_down_counter(), 
                game_screen(),
                game_board(), 
                current_block(generate_block()),
                random_generator(BLOCK_I, BLOCK_Z) {
+    game_screen.update_score_window(score);
+    game_screen.update_message_window(Screen::MESSAGE_EMPTY);
 }
 
 void Game::run() {
     do {
         run_single_frame();
     } while(!is_game_end);
+
+    game_screen.update_message_window(Screen::MESSAGE_GAME_OVER);
+    sleep_for_user_input();
 
     return;
 }
@@ -98,11 +74,28 @@ void Game::run_single_frame() {
     else
         current_block->undo();
 
+    unsigned int erased_rows;
+
     if(is_block_bottom_touched) {
         game_board.fix(*current_block);
         current_block.reset();
-        game_board.erase_full_rows();
+
+        erased_rows = game_board.erase_full_rows();
+
+        if(erased_rows == 4) {
+            score += score_per_tetris;
+            game_screen.update_message_window(Screen::MESSAGE_TETRIS);
+        } else if(erased_rows > 0) {
+            //The value MESSAGE_SINGLE, MESSAGE_DOUBLE, and MESSAGE_TRIPLE has initial value of 1, 2, 3...
+            //So, the static_cast of integer to MessageType converts the number of erased rows to the message.
+            score += erased_rows * score_per_erased_row;
+            game_screen.update_message_window(static_cast<Screen::MessageType>(erased_rows));
+        } else {
+            game_screen.update_message_window(Screen::MESSAGE_EMPTY);
+        }
+
         game_screen.update_main_window(game_board);
+        game_screen.update_score_window(score);
 
         return;
     }
@@ -155,6 +148,14 @@ block_ptr_t Game::generate_block() {
         case BLOCK_Z: return block_ptr_t(new ZBlock()); 
         default: return nullptr;
     }
+}
+
+void Game::sleep_for_user_input() const {
+    wtimeout(game_screen.main_window, -1);
+    wgetch(game_screen.main_window);
+    wtimeout(game_screen.main_window, 0);
+
+    return;
 }
 
 const char Game::get_user_input() const {

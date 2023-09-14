@@ -1,5 +1,3 @@
-#include <iostream>
-#include <unistd.h>
 #include "game.h"
 
 int main(void){

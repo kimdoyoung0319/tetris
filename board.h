@@ -17,7 +17,7 @@ class Board {
     public:
         Board();
 
-        void erase_full_rows();
+        int erase_full_rows();
         void fix(const Block &);
 
         bool is_last_row_full() const;
